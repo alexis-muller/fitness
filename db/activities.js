@@ -1,30 +1,73 @@
-const client = require("./client")
+/* eslint-disable no-useless-catch */
+const client = require("./client");
 
 // database functions
-async function getAllActivities() {
+const getAllActivities = async () => {
+  try {
+    const { rows } = await client.query(`
+            SELECT * FROM activities;
+        `);
 
-}
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+const getActivityById = async (id) => {
+  const {
+    rows: [activity],
+  } = await client.query(
+    `
+            SELECT * FROM activities
+            WHERE id = $1;
+        `,
+    [id]
+  );
+  return activity;
+};
 
-async function getActivityById(id) {
-  
-}
-
-async function getActivityByName(name) {
-
-}
-
-async function attachActivitiesToRoutines(routines) {
-}
+// async function getActivitiesToRoutines(routines) {}
 
 // select and return an array of all activities
-async function createActivity({ name, description }) {
+const createActivity = async ({ name, description }) => {
+  try {
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
+            INSERT INTO activities (name, description)
+            VALUES ($1, $2)
+            RETURNING *;
+        `,
+      [name, description]
+    );
 
-}
+    return activity;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // return the new activity
-async function updateActivity({ id, ...fields }) {
+const updateActivity = async ({ id, name, description }) => {
+  try {
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
+            UPDATE activities
+            SET name =$1, description = $2
+            WHERE id = $3
+            RETURNING *;
+        `,
+      [name, description, id]
+    );
 
-}
+    return activity;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // don't try to update the id
 // do update the name and description
@@ -32,8 +75,8 @@ async function updateActivity({ id, ...fields }) {
 module.exports = {
   getAllActivities,
   getActivityById,
-  getActivityByName,
-  attachActivitiesToRoutines,
+  // getActivityByName,
+  // attachActivitiesToRoutines,
   createActivity,
   updateActivity,
-}
+};
