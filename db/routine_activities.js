@@ -119,6 +119,10 @@ const getRoutineActivityById = async (id) => {
   }
 };
 
+// function canEditRoutineActivity() {
+//   return true;
+// }
+
 module.exports = {
   addActivityToRoutine,
   getRoutineActivitiesByRoutine,
