@@ -28,6 +28,20 @@ const getActivityById = async (id) => {
 
 // async function getActivitiesToRoutines(routines) {}
 
+async function getActivityByName(name) {
+  const {
+    rows: [activity],
+  } = await client.query(
+    `
+            SELECT * FROM activities
+            WHERE name = $1;
+        `,
+    [name]
+  );
+
+  return activity;
+}
+
 // select and return an array of all activities
 const createActivity = async ({ name, description }) => {
   try {
@@ -75,7 +89,7 @@ const updateActivity = async ({ id, name, description }) => {
 module.exports = {
   getAllActivities,
   getActivityById,
-  // getActivityByName,
+  getActivityByName,
   // attachActivitiesToRoutines,
   createActivity,
   updateActivity,

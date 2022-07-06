@@ -59,21 +59,21 @@ const getRoutinesWithoutActivities = async () => {
 
 const destroyRoutine = async (id) => {
   try {
+    await client.query(
+      `
+            DELETE FROM routine_activities
+            WHERE "routineId" IN ($1)
+            RETURNING *;
+        `,
+      [id]
+    );
+
     const {
       rows: [routine],
     } = await client.query(
       `
             DELETE FROM routines
             WHERE id = $1
-            RETURNING *;
-        `,
-      [id]
-    );
-
-    await client.query(
-      `
-            DELETE FROM routine_activities
-            WHERE "routineId" IN ($1)
             RETURNING *;
         `,
       [id]
@@ -87,7 +87,7 @@ const destroyRoutine = async (id) => {
 
 const updateRoutine = async ({ id, isPublic, name, goal }) => {
   try {
-    if (isPublic) {
+    if (isPublic !== undefined) {
       await client.query(
         `
                 UPDATE routines
@@ -139,22 +139,40 @@ const updateRoutine = async ({ id, isPublic, name, goal }) => {
   }
 };
 
-const _joinActitiesToRoutines = async (id) => {
+const _joinActivitiesToRoutines = async (id) => {
   const routine = await getRoutineById(id);
 
-  const routineActivitiesThrough = await getRoutineActivitiesByRoutine({
+  const routineActivities = await getRoutineActivitiesByRoutine({
     id: routine.id,
   });
 
   routine.activities = [];
   await Promise.all(
-    routineActivitiesThrough.map(async (routineActivity) => {
+    routineActivities.map(async (routineActivity) => {
       const activity = await getActivityById(routineActivity.activityId);
       activity.count = routineActivity.count;
       activity.duration = routineActivity.duration;
+      activity.routineId = routine.id;
+      activity.routineActivityId = routineActivity.id;
 
-      const { id, name, description, count, duration } = activity;
-      const orderedActivity = { count, description, duration, id, name };
+      const {
+        id,
+        routineId,
+        routineActivityId,
+        name,
+        description,
+        count,
+        duration,
+      } = activity;
+      const orderedActivity = {
+        routineId,
+        routineActivityId,
+        count,
+        description,
+        duration,
+        id,
+        name,
+      };
       routine.activities.push(orderedActivity);
 
       return activity;
@@ -170,12 +188,12 @@ const _joinActitiesToRoutines = async (id) => {
 const getAllRoutines = async () => {
   try {
     const { rows: routines } = await client.query(`
-            SELECT * FROM routines;
-        `);
+        SELECT * FROM routines;
+    `);
 
     const joinedRoutines = await Promise.all(
       routines.map(async (routine) => {
-        const joinedRoutine = await _joinActitiesToRoutines(routine.id);
+        const joinedRoutine = await _joinActivitiesToRoutines(routine.id);
         return joinedRoutine;
       })
     );
@@ -195,7 +213,7 @@ const getAllPublicRoutines = async () => {
 
     const joinedRoutines = await Promise.all(
       routines.map(async (routine) => {
-        const joinedRoutine = await _joinActitiesToRoutines(routine.id);
+        const joinedRoutine = await _joinActivitiesToRoutines(routine.id);
         return joinedRoutine;
       })
     );
@@ -228,7 +246,7 @@ const getAllRoutinesByUser = async ({ username }) => {
 
     const joinedRoutines = await Promise.all(
       routines.map(async (routine) => {
-        const joinedRoutine = await _joinActitiesToRoutines(routine.id);
+        const joinedRoutine = await _joinActivitiesToRoutines(routine.id);
         return joinedRoutine;
       })
     );
@@ -262,7 +280,7 @@ const getPublicRoutinesByUser = async ({ username }) => {
 
     const joinedRoutines = await Promise.all(
       routines.map(async (routine) => {
-        const joinedRoutine = await _joinActitiesToRoutines(routine.id);
+        const joinedRoutine = await _joinActivitiesToRoutines(routine.id);
         return joinedRoutine;
       })
     );
@@ -296,7 +314,7 @@ const getPublicRoutinesByActivity = async ({ id }) => {
 
     const joinedRoutines = await Promise.all(
       routines.map(async (routine) => {
-        const joinedRoutine = await _joinActitiesToRoutines(routine.id);
+        const joinedRoutine = await _joinActivitiesToRoutines(routine.id);
         return joinedRoutine;
       })
     );

@@ -22,6 +22,8 @@ async function createUser({ username, password }) {
       `,
     [username, hashedPassword]
   );
+
+  delete user.password;
   // });
   return user;
 }

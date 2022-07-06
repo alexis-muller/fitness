@@ -119,13 +119,26 @@ const getRoutineActivityById = async (id) => {
   }
 };
 
-// function canEditRoutineActivity() {
-//   return true;
-// }
+const canEditRoutineActivity = async (routineActivityId, userId) => {
+  const {
+    rows: [routineActivity],
+  } = await client.query(
+    `
+        SELECT "creatorId" FROM 
+        routine_activities INNER JOIN routines
+        ON(  routine_activities."routineId" = routines.id )
+        WHERE routine_activities.id = $1;
+    `,
+    [routineActivityId]
+  );
+
+  return routineActivity.creatorId === userId;
+};
 
 module.exports = {
   addActivityToRoutine,
   getRoutineActivitiesByRoutine,
+  canEditRoutineActivity,
   updateRoutineActivity,
   destroyRoutineActivity,
   getRoutineActivityById,
