@@ -26,8 +26,6 @@ const getActivityById = async (id) => {
   return activity;
 };
 
-// async function getActivitiesToRoutines(routines) {}
-
 async function getActivityByName(name) {
   const {
     rows: [activity],
@@ -42,7 +40,6 @@ async function getActivityByName(name) {
   return activity;
 }
 
-// select and return an array of all activities
 const createActivity = async ({ name, description }) => {
   try {
     const {
@@ -62,24 +59,25 @@ const createActivity = async ({ name, description }) => {
   }
 };
 
-// return the new activity
-const updateActivity = async ({ id, name, description }) => {
+const updateActivity = async ({ id, ...fields }) => {
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(",");
   try {
     const {
       rows: [activity],
     } = await client.query(
       `
-            UPDATE activities
-            SET name =$1, description = $2
-            WHERE id = $3
-            RETURNING *;
-        `,
-      [name, description, id]
+    UPDATE activities
+    SET ${setString}
+    WHERE id=${id}
+    RETURNING *;
+    `,
+      Object.values(fields)
     );
-
     return activity;
   } catch (error) {
-    throw error;
+    console.error(error);
   }
 };
 

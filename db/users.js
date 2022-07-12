@@ -8,7 +8,6 @@ const bcrypt = require("bcrypt");
 async function createUser({ username, password }) {
   const SALT_COUNT = 10;
 
-  //bcrypt.hash(password, SALT_COUNT, async function (err, hashedPassword) {
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   //Query method
   // Creating the user variable, and assigning it the results of the insert
@@ -28,8 +27,6 @@ async function createUser({ username, password }) {
   return user;
 }
 
-// inside of getUser({username, password})
-
 const getUser = async ({ username, password }) => {
   const user = await getUserByUsername(username);
   if (!user) {
@@ -43,8 +40,6 @@ const getUser = async ({ username, password }) => {
     return user;
   }
 };
-
-// async function getUserById(userId) {}
 
 const getUserById = async (id) => {
   const {
@@ -60,8 +55,6 @@ const getUserById = async (id) => {
   delete user.password;
   return user;
 };
-
-// async function getUserByUsername(userName) {}
 
 const getUserByUsername = async (username) => {
   const {
