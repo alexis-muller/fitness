@@ -27,7 +27,7 @@ server.get("/", async (req, res, next) => {
 // const stdout = execSync("npx kill-port 3000");
 // console.log("stdout: ", stdout);
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3010 } = process.env;
 server.listen(PORT, () => {
   console.log(`listening at http://localhost:${PORT}`);
   client.connect();
