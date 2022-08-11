@@ -19,6 +19,10 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+  return res.send("API Running");
+});
+
 const apiRouter = require("./api");
 app.use("/api", apiRouter);
 
