@@ -39,7 +39,7 @@ apiRouter.use(function (error, req, res) {
 });
 
 const PORT = 3003;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   client.connect();
   console.log("The server is up on port", `http://localhost:${PORT}`);
 });
