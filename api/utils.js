@@ -3,7 +3,7 @@
 function requireUser(req, res, next) {
   if (req.headers.authorization === undefined) {
     res.status(401);
-    res.send({
+    return res.send({
       error: "401",
       message: "You must be logged in to perform this action",
       name: "missing user",

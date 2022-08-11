@@ -40,6 +40,23 @@ async function getActivityByName(name) {
   return activity;
 }
 
+const attachActivitiesToRoutines = async ({
+  routineId,
+  activityId,
+  duration,
+  count,
+}) => {
+  try {
+    const { rows } = await client.query(
+      `INSERT INTO routine_activities ("routineId", "activityId", "duration", "count") VALUES ($1, $2, $3, $4) RETURNING *;`,
+      [routineId, activityId, duration, count]
+    );
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const createActivity = async ({ name, description }) => {
   try {
     const {
@@ -77,7 +94,7 @@ const updateActivity = async ({ id, ...fields }) => {
     );
     return activity;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
 
@@ -88,7 +105,7 @@ module.exports = {
   getAllActivities,
   getActivityById,
   getActivityByName,
-  // attachActivitiesToRoutines,
+  attachActivitiesToRoutines,
   createActivity,
   updateActivity,
 };

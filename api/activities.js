@@ -1,17 +1,3 @@
-// //Starter code
-// const express = require("express");
-// const router = express.Router();
-
-// // GET /api/activities/:activityId/routines
-
-// // GET /api/activities
-
-// // POST /api/activities
-
-// // PATCH /api/activities/:activityId
-
-// module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 const { ActivityExistsError, ActivityNotFoundError } = require("../errors");
@@ -91,7 +77,7 @@ router.patch("/:activityId", async (req, res, next) => {
     });
     res.send(activity);
   } catch (error) {
-    next(error);
+    console.error(error);
   }
 });
 

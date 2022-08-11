@@ -1,19 +1,3 @@
-// //Starter Code
-// const express = require('express');
-// const router = express.Router();
-
-// // GET /api/routines
-
-// // POST /api/routines
-
-// // PATCH /api/routines/:routineId
-
-// // DELETE /api/routines/:routineId
-
-// // POST /api/routines/:routineId/activities
-
-// module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 const {
@@ -76,9 +60,9 @@ router.patch("/:routineId", requireUser, async (req, res) => {
 
         if (user.id !== routine.creatorId) {
           res.status(403);
-          res.send({
+          return res.send({
             error: "not the owner",
-            message: `User ${user.username} is not allowed to update Every day`,
+            message: `User ${user.username} is not allowed to update ${routine.name}`,
             name: "not the owner",
           });
         }
@@ -101,7 +85,7 @@ router.patch("/:routineId", requireUser, async (req, res) => {
       updateFields.id = req.params.routineId;
 
       const updatedroutine = await updateRoutine(updateFields);
-      res.send(updatedroutine);
+      return res.send(updatedroutine);
     }
   } catch (error) {
     // console.error(error);
@@ -121,7 +105,7 @@ router.delete("/:routineId", requireUser, async (req, res) => {
 
       if (user.id !== routine.creatorId) {
         res.status(403);
-        res.send({
+        return res.send({
           error: "not the owner",
           message: `User ${user.username} is not allowed to delete On even days`,
           name: "not the owner",
@@ -129,18 +113,18 @@ router.delete("/:routineId", requireUser, async (req, res) => {
       }
 
       const destroyedRoutine = await destroyRoutine(req.params.routineId);
-      res.send(destroyedRoutine);
+      return res.send(destroyedRoutine);
     }
   } catch (error) {
     console.error(error);
-    res.send(error.message);
+    return res.send(error.message);
   }
 });
 
 router.post("/:routineId/activities", async (req, res) => {
   try {
-    const routine = await getRoutineById(req.params.routineId);
-    console.log("routine", routine);
+    // const routine = await getRoutineById(req.params.routineId);
+    // console.log("routine", routine);
 
     const _compRoutine = await getRoutineActivitiesByRoutine({
       id: req.params.routineId,
@@ -152,16 +136,16 @@ router.post("/:routineId/activities", async (req, res) => {
       );
 
     if (_routineActivity && _routineActivity.length) {
-      res.send({
+      return res.send({
         error: "activity allready exists on routine",
         message: `Activity ID ${req.body.activityId} already exists in Routine ID ${req.body.routineId}`,
         name: "activity allready exists on routine",
       });
     }
 
-    const newRoutine = await attachActivitiesToRoutines([req.body]);
-    console.log("newroutine", newRoutine[0]);
-    res.send(newRoutine[0]);
+    const newRoutine = await attachActivitiesToRoutines(req.body);
+    // console.log(newRoutine);
+    return res.send(newRoutine[0]);
   } catch (error) {
     console.error(error);
   }
