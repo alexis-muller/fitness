@@ -39,7 +39,7 @@ apiRouter.use(function (error, req, res) {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   client.connect();
   console.log("The server is up on port", `http://localhost:${PORT}`);
 });
